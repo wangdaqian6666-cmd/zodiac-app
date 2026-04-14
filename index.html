@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>开运 · 坏事上早八</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- 背景星空 -->
+<canvas id="starCanvas"></canvas>
+
+<!-- 顶部标题栏 -->
+<header class="app-header">
+  <div class="header-inner">
+    <div class="header-logo">🔮 开运</div>
+    <div class="header-right">
+      <div class="header-date" id="headerDate"></div>
+      <button class="music-btn" id="musicBtn" title="背景音乐">🎵</button>
+    </div>
+  </div>
+</header>
+
+<!-- 主内容 -->
+<main class="app-main">
+
+  <!-- Tab导航 -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="fortune">
+      <span class="tab-icon">✨</span>
+      <span class="tab-label">每日运势</span>
+    </button>
+    <button class="tab-btn" data-tab="tarot">
+      <span class="tab-icon">🃏</span>
+      <span class="tab-label">塔罗占卜</span>
+    </button>
+    <button class="tab-btn" data-tab="wallpaper">
+      <span class="tab-icon">🌌</span>
+      <span class="tab-label">开运壁纸</span>
+    </button>
+    <button class="tab-btn" data-tab="wish">
+      <span class="tab-icon">🕯️</span>
+      <span class="tab-label">许愿墙</span>
+    </button>
+    <button class="tab-btn" data-tab="calendar">
+      <span class="tab-icon">📅</span>
+      <span class="tab-label">玄学日历</span>
+    </button>
+  </nav>
+
+  <!-- 每日运势 -->
+  <section class="tab-panel active" id="tab-fortune">
+    <div class="fortune-hero">
+      <div class="fortune-orb" id="fortuneOrb">
+        <div class="orb-inner">
+          <div class="orb-symbol" id="orbSymbol">✨</div>
+          <div class="orb-score" id="orbScore">88</div>
+          <div class="orb-label">今日运势</div>
+        </div>
+        <div class="orb-ring ring1"></div>
+        <div class="orb-ring ring2"></div>
+        <div class="orb-ring ring3"></div>
+      </div>
+      <div class="fortune-zodiac" id="fortuneZodiac">
+        <span class="zodiac-tag" id="zodiacTag">选择星座</span>
+      </div>
+    </div>
+
+    <!-- 星座选择 -->
+    <div class="zodiac-picker">
+      <div class="picker-title">选择你的星座</div>
+      <div class="zodiac-grid">
+        <button class="zodiac-item" data-zodiac="白羊座" data-symbol="♈">♈<span>白羊</span></button>
+        <button class="zodiac-item" data-zodiac="金牛座" data-symbol="♉">♉<span>金牛</span></button>
+        <button class="zodiac-item" data-zodiac="双子座" data-symbol="♊">♊<span>双子</span></button>
+        <button class="zodiac-item" data-zodiac="巨蟹座" data-symbol="♋">♋<span>巨蟹</span></button>
+        <button class="zodiac-item" data-zodiac="狮子座" data-symbol="♌">♌<span>狮子</span></button>
+        <button class="zodiac-item" data-zodiac="处女座" data-symbol="♍">♍<span>处女</span></button>
+        <button class="zodiac-item" data-zodiac="天秤座" data-symbol="♎">♎<span>天秤</span></button>
+        <button class="zodiac-item" data-zodiac="天蝎座" data-symbol="♏">♏<span>天蝎</span></button>
+        <button class="zodiac-item" data-zodiac="射手座" data-symbol="♐">♐<span>射手</span></button>
+        <button class="zodiac-item" data-zodiac="摩羯座" data-symbol="♑">♑<span>摩羯</span></button>
+        <button class="zodiac-item" data-zodiac="水瓶座" data-symbol="♒">♒<span>水瓶</span></button>
+        <button class="zodiac-item" data-zodiac="双鱼座" data-symbol="♓">♓<span>双鱼</span></button>
+      </div>
+    </div>
+
+    <!-- 运势详情 -->
+    <div class="fortune-detail" id="fortuneDetail" style="display:none">
+      <div class="detail-cards">
+        <div class="detail-card">
+          <div class="card-icon">💰</div>
+          <div class="card-name">财运</div>
+          <div class="card-stars" id="starMoney"></div>
+          <div class="card-desc" id="descMoney"></div>
+        </div>
+        <div class="detail-card">
+          <div class="card-icon">💕</div>
+          <div class="card-name">爱情</div>
+          <div class="card-stars" id="starLove"></div>
+          <div class="card-desc" id="descLove"></div>
+        </div>
+        <div class="detail-card">
+          <div class="card-icon">💼</div>
+          <div class="card-name">事业</div>
+          <div class="card-stars" id="starCareer"></div>
+          <div class="card-desc" id="descCareer"></div>
+        </div>
+        <div class="detail-card">
+          <div class="card-icon">🌿</div>
+          <div class="card-name">健康</div>
+          <div class="card-stars" id="starHealth"></div>
+          <div class="card-desc" id="descHealth"></div>
+        </div>
+      </div>
+      <div class="fortune-summary">
+        <div class="summary-title">🔮 今日玄言</div>
+        <div class="summary-text" id="summaryText"></div>
+        <div class="lucky-row">
+          <div class="lucky-item"><span class="lucky-label">幸运色</span><span class="lucky-val" id="luckyColor"></span></div>
+          <div class="lucky-item"><span class="lucky-label">幸运数</span><span class="lucky-val" id="luckyNum"></span></div>
+          <div class="lucky-item"><span class="lucky-label">宜</span><span class="lucky-val" id="luckyDo"></span></div>
+          <div class="lucky-item"><span class="lucky-label">忌</span><span class="lucky-val" id="luckyDont"></span></div>
+        </div>
+      </div>
+
+      <!-- 功能3：本周运势走势图 -->
+      <div class="week-chart-wrap" id="weekChartWrap">
+        <div class="week-chart-title">📈 本周运势走势</div>
+        <canvas id="weekChartCanvas" class="week-chart-canvas"></canvas>
+        <div class="week-chart-legend">
+          <span class="legend-item"><i style="background:#FFB800"></i>财运</span>
+          <span class="legend-item"><i style="background:#F472B6"></i>爱情</span>
+          <span class="legend-item"><i style="background:#22D3EE"></i>事业</span>
+          <span class="legend-item"><i style="background:#4ADE80"></i>健康</span>
+        </div>
+      </div>
+
+      <!-- 功能1：分享图按钮 -->
+      <button class="btn-share-img" id="btnShareImg">✨ 生成分享图</button>
+    </div>
+  </section>
+
+  <!-- 分享图预览弹窗 -->
+  <div class="share-preview" id="sharePreview" style="display:none">
+    <div class="share-backdrop" id="shareBackdrop"></div>
+    <div class="share-modal">
+      <div class="share-canvas-wrap">
+        <canvas id="shareCanvas" width="360" height="360"></canvas>
+      </div>
+      <div class="share-actions">
+        <button class="btn-share-download" id="btnShareDownload">⬇️ 保存图片</button>
+        <button class="btn-share-close" id="btnShareClose">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 塔罗占卜 -->
+  <section class="tab-panel" id="tab-tarot">
+    <div class="tarot-header">
+      <div class="tarot-title">🃏 塔罗占卜</div>
+      <div class="tarot-subtitle">心中默想你的问题，然后翻开一张牌</div>
+    </div>
+
+    <div class="question-input-wrap">
+      <input class="question-input" id="tarotQuestion" placeholder="输入你想占卜的问题（可选）" maxlength="30">
+    </div>
+
+    <div class="tarot-deck" id="tarotDeck">
+      <div class="deck-cards">
+        <div class="deck-card back" id="card1" data-idx="0">🔮</div>
+        <div class="deck-card back" id="card2" data-idx="1">🔮</div>
+        <div class="deck-card back" id="card3" data-idx="2">🔮</div>
+      </div>
+      <div class="deck-hint">点击任意一张牌</div>
+    </div>
+
+    <div class="tarot-result" id="tarotResult" style="display:none">
+      <div class="result-card-display">
+        <div class="result-card-emoji" id="resultEmoji"></div>
+        <div class="result-card-name" id="resultName"></div>
+        <div class="result-card-type" id="resultType"></div>
+      </div>
+      <div class="result-content">
+        <div class="result-meaning" id="resultMeaning"></div>
+        <div class="result-advice">
+          <div class="advice-title">✦ 给你的建议</div>
+          <div class="advice-text" id="resultAdvice"></div>
+        </div>
+        <div class="result-affirmation" id="resultAffirmation"></div>
+      </div>
+      <button class="btn-retry" id="tarotRetry">🔄 再占一次</button>
+    </div>
+  </section>
+
+  <!-- 开运壁纸 -->
+  <section class="tab-panel" id="tab-wallpaper">
+    <div class="wallpaper-header">
+      <div class="wallpaper-title">🌌 开运壁纸</div>
+      <div class="wallpaper-subtitle">选择你需要的能量，设为手机壁纸</div>
+    </div>
+    <div class="wallpaper-grid" id="wallpaperGrid"></div>
+    <div class="wallpaper-preview" id="wallpaperPreview" style="display:none">
+      <div class="preview-backdrop" id="previewBackdrop"></div>
+      <div class="preview-modal">
+        <div class="preview-canvas-wrap">
+          <canvas id="wallpaperCanvas" width="270" height="480"></canvas>
+        </div>
+        <div class="preview-info">
+          <div class="preview-name" id="previewName"></div>
+          <div class="preview-desc" id="previewDesc"></div>
+        </div>
+        <div class="preview-actions">
+          <button class="btn-download" id="btnDownload">⬇️ 保存壁纸</button>
+          <button class="btn-close-preview" id="btnClosePreview">关闭</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 许愿墙 -->
+  <section class="tab-panel" id="tab-wish">
+    <div class="wish-header">
+      <div class="wish-title">🕯️ 许愿墙</div>
+      <div class="wish-subtitle">写下你的心愿，宇宙会收到的</div>
+    </div>
+    <div class="wish-input-area">
+      <div class="candle-deco">🕯️</div>
+      <textarea class="wish-textarea" id="wishInput" placeholder="写下你的心愿..." maxlength="50"></textarea>
+      <div class="wish-char-count"><span id="wishCount">0</span>/50</div>
+      <button class="btn-wish" id="btnWish">✨ 许愿</button>
+    </div>
+    <div class="wish-wall" id="wishWall"></div>
+  </section>
+
+  <!-- 玄学日历 -->
+  <section class="tab-panel" id="tab-calendar">
+    <div class="calendar-header-row">
+      <button class="cal-nav" id="calPrev">‹</button>
+      <div class="cal-month" id="calMonth"></div>
+      <button class="cal-nav" id="calNext">›</button>
+    </div>
+    <div class="calendar-grid">
+      <div class="cal-weekday">日</div><div class="cal-weekday">一</div>
+      <div class="cal-weekday">二</div><div class="cal-weekday">三</div>
+      <div class="cal-weekday">四</div><div class="cal-weekday">五</div>
+      <div class="cal-weekday">六</div>
+      <div id="calDays" class="cal-days-grid"></div>
+    </div>
+    <div class="day-detail" id="dayDetail">
+      <div class="day-detail-date" id="detailDate"></div>
+      <div class="day-detail-grid">
+        <div class="day-info-card">
+          <div class="day-info-label">宜</div>
+          <div class="day-info-val" id="detailYi"></div>
+        </div>
+        <div class="day-info-card">
+          <div class="day-info-label">忌</div>
+          <div class="day-info-val" id="detailJi"></div>
+        </div>
+        <div class="day-info-card">
+          <div class="day-info-label">吉神</div>
+          <div class="day-info-val" id="detailGod"></div>
+        </div>
+        <div class="day-info-card">
+          <div class="day-info-label">今日签</div>
+          <div class="day-info-val" id="detailSign"></div>
+        </div>
+      </div>
+      <div class="day-affirmation" id="detailAffirmation"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 底部水印 -->
+<div class="app-footer">@坏事上早八 · 私信【开运】领壁纸</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
