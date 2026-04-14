@@ -1,0 +1,588 @@
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d0818;
+  --bg2: #150d2a;
+  --surface: rgba(255,255,255,0.05);
+  --surface2: rgba(255,255,255,0.09);
+  --border: rgba(255,255,255,0.12);
+  --gold: #FFB800;
+  --gold2: #FFD700;
+  --purple: #C084FC;
+  --pink: #F472B6;
+  --cyan: #22D3EE;
+  --text: rgba(255,255,255,0.92);
+  --text2: rgba(255,255,255,0.55);
+  --radius: 18px;
+  --radius-sm: 10px;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+}
+
+html, body {
+  height: 100%; width: 100%;
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 星空Canvas ── */
+#starCanvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── Header ── */
+.app-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,8,24,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+}
+.header-logo {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 20px; font-weight: 700;
+  background: linear-gradient(135deg, var(--gold), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-date { font-size: 12px; color: var(--text2); }
+
+/* ── Main ── */
+.app-main {
+  position: relative; z-index: 1;
+  max-width: 480px; margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+/* ── Tab Nav ── */
+.tab-nav {
+  display: flex; gap: 4px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky; top: 57px; z-index: 90;
+  background: rgba(13,8,24,0.8);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 14px; border-radius: 30px;
+  border: 1px solid transparent;
+  background: transparent; color: var(--text2);
+  cursor: pointer; transition: all 0.25s var(--ease);
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.tab-btn .tab-icon { font-size: 16px; }
+.tab-btn .tab-label { font-size: 11px; white-space: nowrap; }
+.tab-btn.active {
+  background: rgba(192,132,252,0.15);
+  border-color: rgba(192,132,252,0.4);
+  color: var(--purple);
+}
+.tab-btn:hover:not(.active) { background: var(--surface); color: var(--text); }
+
+/* ── Tab Panel ── */
+.tab-panel { display: none; padding: 20px 16px; animation: fadeUp 0.4s var(--ease); }
+.tab-panel.active { display: block; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ══════════════════════════════
+   每日运势
+══════════════════════════════ */
+.fortune-hero {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 24px 0 16px;
+}
+.fortune-orb {
+  position: relative; width: 180px; height: 180px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+}
+.orb-inner {
+  position: relative; z-index: 2;
+  width: 140px; height: 140px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(192,132,252,0.4), rgba(13,8,24,0.9));
+  border: 2px solid rgba(192,132,252,0.5);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  box-shadow: 0 0 40px rgba(192,132,252,0.3), inset 0 0 30px rgba(192,132,252,0.1);
+}
+.orb-symbol { font-size: 28px; }
+.orb-score {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 44px; font-weight: 700; line-height: 1;
+  background: linear-gradient(135deg, var(--gold), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.orb-label { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.orb-ring {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(192,132,252,0.25);
+  animation: spin linear infinite;
+}
+.ring1 { width: 158px; height: 158px; animation-duration: 12s; border-style: dashed; }
+.ring2 { width: 174px; height: 174px; animation-duration: 20s; animation-direction: reverse; }
+.ring3 { width: 190px; height: 190px; animation-duration: 30s; border-color: rgba(255,184,0,0.15); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.zodiac-tag {
+  display: inline-block;
+  padding: 6px 18px; border-radius: 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  font-size: 14px; color: var(--text2);
+}
+
+/* 星座选择器 */
+.zodiac-picker { margin-top: 16px; }
+.picker-title {
+  font-size: 13px; color: var(--text2); text-align: center;
+  margin-bottom: 14px;
+}
+.zodiac-grid {
+  display: grid; grid-template-columns: repeat(6,1fr); gap: 10px;
+}
+.zodiac-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 4px; border-radius: var(--radius-sm);
+  background: var(--surface); border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.2s var(--ease);
+  font-size: 20px; color: var(--text2);
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.zodiac-item span { font-size: 10px; }
+.zodiac-item:hover, .zodiac-item.active {
+  background: rgba(192,132,252,0.2);
+  border-color: var(--purple);
+  color: var(--text); transform: translateY(-2px);
+}
+
+/* 运势详情 */
+.fortune-detail { margin-top: 20px; }
+.detail-cards {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin-bottom: 16px;
+}
+.detail-card {
+  padding: 16px; border-radius: var(--radius);
+  background: var(--surface2); border: 1px solid var(--border);
+  text-align: center;
+}
+.card-icon { font-size: 24px; margin-bottom: 6px; }
+.card-name { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+.card-stars { font-size: 13px; color: var(--gold); margin-bottom: 8px; }
+.card-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+.fortune-summary {
+  padding: 20px; border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(192,132,252,0.1), rgba(255,184,0,0.08));
+  border: 1px solid rgba(192,132,252,0.25);
+}
+.summary-title { font-size: 14px; color: var(--purple); margin-bottom: 10px; }
+.summary-text {
+  font-size: 14px; line-height: 1.8; color: var(--text);
+  font-family: 'Noto Serif SC', serif; margin-bottom: 16px;
+}
+.lucky-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;
+}
+.lucky-item {
+  display: flex; flex-direction: column; gap: 4px; text-align: center;
+  padding: 8px 4px; border-radius: 8px; background: var(--surface);
+}
+.lucky-label { font-size: 10px; color: var(--text2); }
+.lucky-val { font-size: 12px; color: var(--gold); font-weight: 500; }
+
+/* ══════════════════════════════
+   塔罗占卜
+══════════════════════════════ */
+.tarot-header { text-align: center; padding: 16px 0 20px; }
+.tarot-title { font-family: 'Noto Serif SC',serif; font-size: 24px; margin-bottom: 8px; }
+.tarot-subtitle { font-size: 13px; color: var(--text2); }
+
+.question-input-wrap { margin-bottom: 24px; }
+.question-input {
+  width: 100%; padding: 12px 16px; border-radius: 30px;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-size: 14px; outline: none;
+  font-family: 'Noto Sans SC',sans-serif;
+  transition: border-color 0.2s;
+}
+.question-input:focus { border-color: var(--purple); }
+.question-input::placeholder { color: var(--text2); }
+
+.tarot-deck { text-align: center; }
+.deck-cards {
+  display: flex; justify-content: center; gap: 16px; margin-bottom: 16px;
+}
+.deck-card {
+  width: 90px; height: 140px; border-radius: 12px;
+  background: linear-gradient(135deg, #1a0d35, #2d1060);
+  border: 2px solid rgba(192,132,252,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; cursor: pointer;
+  transition: all 0.3s var(--ease);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  position: relative; overflow: hidden;
+}
+.deck-card::before {
+  content: '';
+  position: absolute; inset: 4px; border-radius: 8px;
+  border: 1px solid rgba(192,132,252,0.2);
+}
+.deck-card:hover { transform: translateY(-8px) rotate(-3deg); border-color: var(--purple); }
+.deck-card:nth-child(2):hover { transform: translateY(-12px) rotate(0deg); }
+.deck-card:nth-child(3):hover { transform: translateY(-8px) rotate(3deg); }
+.deck-hint { font-size: 13px; color: var(--text2); animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+.tarot-result { animation: fadeUp 0.5s var(--ease); }
+.result-card-display {
+  text-align: center; padding: 24px;
+  background: linear-gradient(135deg, rgba(192,132,252,0.12), rgba(255,184,0,0.08));
+  border-radius: var(--radius); border: 1px solid rgba(192,132,252,0.3);
+  margin-bottom: 16px;
+}
+.result-card-emoji { font-size: 64px; margin-bottom: 12px; }
+.result-card-name { font-family: 'Noto Serif SC',serif; font-size: 24px; margin-bottom: 6px; }
+.result-card-type { font-size: 12px; color: var(--gold); }
+
+.result-content { margin-bottom: 16px; }
+.result-meaning {
+  font-size: 15px; line-height: 1.8; color: var(--text);
+  padding: 16px; border-radius: var(--radius);
+  background: var(--surface); margin-bottom: 12px;
+}
+.result-advice {
+  padding: 16px; border-radius: var(--radius);
+  background: rgba(255,184,0,0.08); border: 1px solid rgba(255,184,0,0.2);
+  margin-bottom: 12px;
+}
+.advice-title { font-size: 13px; color: var(--gold); margin-bottom: 8px; }
+.advice-text { font-size: 14px; line-height: 1.7; }
+.result-affirmation {
+  text-align: center; padding: 14px; border-radius: 30px;
+  background: linear-gradient(135deg, rgba(192,132,252,0.2), rgba(34,211,238,0.1));
+  font-size: 15px; font-family: 'Noto Serif SC',serif; color: var(--purple);
+}
+.btn-retry {
+  width: 100%; padding: 14px; border-radius: 30px;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); font-size: 15px; cursor: pointer;
+  transition: all 0.2s; font-family: 'Noto Sans SC',sans-serif;
+}
+.btn-retry:hover { background: rgba(192,132,252,0.15); border-color: var(--purple); }
+
+/* ══════════════════════════════
+   开运壁纸
+══════════════════════════════ */
+.wallpaper-header { text-align: center; padding: 16px 0 20px; }
+.wallpaper-title { font-family: 'Noto Serif SC',serif; font-size: 24px; margin-bottom: 8px; }
+.wallpaper-subtitle { font-size: 13px; color: var(--text2); }
+
+.wallpaper-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+}
+.wallpaper-thumb {
+  border-radius: var(--radius-sm); overflow: hidden;
+  cursor: pointer; position: relative;
+  aspect-ratio: 9/16;
+  transition: transform 0.3s var(--ease);
+  border: 1px solid var(--border);
+}
+.wallpaper-thumb:hover { transform: scale(1.04); }
+.wallpaper-thumb canvas { width:100%; height:100%; display:block; }
+.wallpaper-thumb-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 6px 4px; text-align: center;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  font-size: 11px; color: white;
+}
+
+/* 预览弹窗 */
+.wallpaper-preview { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; }
+.preview-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+}
+.preview-modal {
+  position: relative; z-index: 1;
+  background: var(--bg2); border-radius: 24px;
+  border: 1px solid var(--border); padding: 24px;
+  width: 320px; text-align: center;
+  animation: fadeUp 0.35s var(--ease);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+}
+.preview-canvas-wrap {
+  border-radius: 16px; overflow: hidden;
+  margin-bottom: 16px; border: 1px solid var(--border);
+}
+#wallpaperCanvas { display: block; width: 270px; height: 480px; }
+.preview-name { font-family: 'Noto Serif SC',serif; font-size: 20px; margin-bottom: 6px; }
+.preview-desc { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+.preview-actions { display: flex; gap: 10px; }
+.btn-download {
+  flex: 1; padding: 12px; border-radius: 30px;
+  background: linear-gradient(135deg, var(--gold), #FF8C00);
+  border: none; color: #1a0d00; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: opacity 0.2s;
+  font-family: 'Noto Sans SC',sans-serif;
+}
+.btn-download:hover { opacity: 0.85; }
+.btn-close-preview {
+  flex: 1; padding: 12px; border-radius: 30px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-size: 14px; cursor: pointer;
+  font-family: 'Noto Sans SC',sans-serif;
+}
+
+/* ══════════════════════════════
+   许愿墙
+══════════════════════════════ */
+.wish-header { text-align: center; padding: 16px 0 20px; }
+.wish-title { font-family: 'Noto Serif SC',serif; font-size: 24px; margin-bottom: 8px; }
+.wish-subtitle { font-size: 13px; color: var(--text2); }
+.wish-input-area {
+  padding: 24px 20px; border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(192,132,252,0.08), rgba(255,184,0,0.05));
+  border: 1px solid rgba(192,132,252,0.2);
+  margin-bottom: 24px; text-align: center;
+}
+.candle-deco { font-size: 36px; margin-bottom: 12px; animation: flicker 2s ease-in-out infinite; }
+@keyframes flicker { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05) rotate(2deg)} }
+.wish-textarea {
+  width: 100%; height: 80px; padding: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); resize: none; outline: none;
+  font-size: 15px; line-height: 1.6; margin-bottom: 8px;
+  font-family: 'Noto Sans SC',sans-serif;
+}
+.wish-textarea:focus { border-color: var(--purple); }
+.wish-char-count { font-size: 12px; color: var(--text2); text-align: right; margin-bottom: 12px; }
+.btn-wish {
+  padding: 12px 32px; border-radius: 30px;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  border: none; color: white; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; font-family: 'Noto Sans SC',sans-serif;
+}
+.btn-wish:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(192,132,252,0.4); }
+.wish-wall {
+  display: flex; flex-wrap: wrap; gap: 10px;
+}
+.wish-bubble {
+  padding: 10px 16px; border-radius: 20px;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 13px; animation: popIn 0.4s var(--ease);
+  position: relative;
+}
+.wish-bubble::before { content: '🕯️'; margin-right: 6px; font-size: 12px; }
+.wish-bubble .wish-time { font-size: 10px; color: var(--text2); margin-top: 4px; }
+@keyframes popIn {
+  from { transform:scale(0.8); opacity:0; }
+  to   { transform:scale(1); opacity:1; }
+}
+
+/* ══════════════════════════════
+   玄学日历
+══════════════════════════════ */
+.calendar-header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 4px 20px;
+}
+.cal-month { font-family: 'Noto Serif SC',serif; font-size: 20px; }
+.cal-nav {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.cal-nav:hover { background: var(--surface2); border-color: var(--purple); }
+.calendar-grid {
+  background: var(--surface); border-radius: var(--radius);
+  border: 1px solid var(--border); overflow: hidden; margin-bottom: 16px;
+}
+.cal-weekday {
+  display: inline-block; width: calc(100%/7);
+  padding: 10px 0; text-align: center;
+  font-size: 12px; color: var(--text2);
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+}
+.cal-days-grid {
+  display: grid; grid-template-columns: repeat(7,1fr);
+}
+.cal-day {
+  padding: 8px 4px; text-align: center; cursor: pointer;
+  font-size: 13px; transition: all 0.2s; border-radius: 6px;
+  min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+}
+.cal-day:hover:not(.empty) { background: rgba(192,132,252,0.15); }
+.cal-day.today { color: var(--gold); font-weight: 700; }
+.cal-day.today .day-num { background: var(--gold); color: #1a0d00; border-radius: 50%; width: 24px; height: 24px; display:flex; align-items:center; justify-content:center; font-size:12px; }
+.cal-day.selected { background: rgba(192,132,252,0.2); border: 1px solid var(--purple); }
+.cal-day .day-emoji { font-size: 10px; }
+.cal-day.empty { cursor: default; }
+.cal-day.other-month { color: var(--text2); opacity: 0.4; }
+
+.day-detail {
+  padding: 20px; border-radius: var(--radius);
+  background: var(--surface2); border: 1px solid var(--border);
+}
+.day-detail-date { font-family:'Noto Serif SC',serif; font-size:18px; margin-bottom:14px; color:var(--gold); }
+.day-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.day-info-card {
+  padding:12px; border-radius:var(--radius-sm);
+  background:var(--surface); border:1px solid var(--border);
+}
+.day-info-label { font-size:11px; color:var(--text2); margin-bottom:6px; }
+.day-info-val { font-size:13px; line-height:1.5; }
+.day-affirmation {
+  text-align:center; padding:12px; border-radius:30px;
+  background:linear-gradient(135deg, rgba(192,132,252,0.15), rgba(34,211,238,0.08));
+  font-size:14px; color:var(--purple); font-family:'Noto Serif SC',serif;
+}
+
+/* ── Footer ── */
+.app-footer {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  text-align: center; padding: 10px;
+  font-size: 11px; color: var(--text2);
+  background: rgba(13,8,24,0.9); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border); z-index: 100;
+}
+
+/* ── 滚动条 ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(192,132,252,0.3); border-radius: 2px; }
+
+/* ══════════════════════════════
+   新功能：背景音乐按钮
+══════════════════════════════ */
+.header-right {
+  display: flex; align-items: center; gap: 10px;
+}
+.music-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(192,132,252,0.15);
+  border: 1px solid rgba(192,132,252,0.35);
+  font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  flex-shrink: 0;
+}
+.music-btn:hover { background: rgba(192,132,252,0.28); transform: scale(1.08); }
+.music-btn.playing {
+  background: rgba(192,132,252,0.3);
+  border-color: var(--purple);
+  box-shadow: 0 0 12px rgba(192,132,252,0.4);
+  animation: musicPulse 2s ease-in-out infinite;
+}
+@keyframes musicPulse {
+  0%,100% { box-shadow: 0 0 12px rgba(192,132,252,0.4); }
+  50%      { box-shadow: 0 0 22px rgba(192,132,252,0.7); }
+}
+
+/* ══════════════════════════════
+   新功能：本周走势图
+══════════════════════════════ */
+.week-chart-wrap {
+  margin-top: 20px;
+  padding: 18px 14px 14px;
+  border-radius: var(--radius);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(192,132,252,0.2);
+}
+.week-chart-title {
+  font-size: 14px; color: var(--purple);
+  margin-bottom: 14px; font-family: 'Noto Serif SC', serif;
+}
+.week-chart-canvas {
+  display: block; width: 100%; height: 160px;
+  border-radius: 10px;
+}
+.week-chart-legend {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin-top: 10px; justify-content: center;
+}
+.legend-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--text2);
+}
+.legend-item i {
+  display: inline-block; width: 20px; height: 3px;
+  border-radius: 2px;
+}
+
+/* ══════════════════════════════
+   新功能：生成分享图按钮
+══════════════════════════════ */
+.btn-share-img {
+  display: block; width: 100%; margin-top: 16px;
+  padding: 14px; border-radius: 30px;
+  background: linear-gradient(135deg, rgba(192,132,252,0.25), rgba(255,184,0,0.2));
+  border: 1px solid rgba(192,132,252,0.45);
+  color: var(--text); font-size: 15px; font-weight: 600;
+  cursor: pointer; font-family: 'Noto Sans SC', sans-serif;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  letter-spacing: 0.05em;
+}
+.btn-share-img:hover {
+  background: linear-gradient(135deg, rgba(192,132,252,0.4), rgba(255,184,0,0.3));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(192,132,252,0.3);
+}
+
+/* 分享图预览弹窗 */
+.share-preview {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+}
+.share-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+}
+.share-modal {
+  position: relative; z-index: 1;
+  background: var(--bg2); border-radius: 24px;
+  border: 1px solid var(--border); padding: 20px;
+  width: min(380px, 92vw); text-align: center;
+  animation: fadeUp 0.35s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+}
+.share-canvas-wrap {
+  border-radius: 16px; overflow: hidden;
+  margin-bottom: 16px; border: 1px solid var(--border);
+  background: #0d0818;
+}
+#shareCanvas {
+  display: block; width: 100%; height: auto;
+}
+.share-actions { display: flex; gap: 10px; }
+.btn-share-download {
+  flex: 1; padding: 12px; border-radius: 30px;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  border: none; color: white; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: opacity 0.2s;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+.btn-share-download:hover { opacity: 0.85; }
+.btn-share-close {
+  flex: 1; padding: 12px; border-radius: 30px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-size: 14px; cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif;
+}
